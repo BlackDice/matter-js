@@ -34,10 +34,10 @@ var Bounds = {};
      * @param {vector} velocity
      */
     Bounds.update = function(bounds, vertices, velocity) {
-        bounds.min.x = Number.MAX_VALUE;
-        bounds.max.x = Number.MIN_VALUE;
-        bounds.min.y = Number.MAX_VALUE;
-        bounds.max.y = Number.MIN_VALUE;
+        bounds.min.x = 1000000;
+        bounds.max.x = -1000000;
+        bounds.min.y = 1000000;
+        bounds.max.y = -1000000;
 
         for (var i = 0; i < vertices.length; i++) {
             var vertex = vertices[i];

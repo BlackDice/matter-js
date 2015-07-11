@@ -255,7 +255,7 @@ var Bodies = {};
 
                     // create a compound part
                     parts.push({
-                        position: Vertices.centre(chunkVertices),
+                        position: Vertices.boundsCentre(chunkVertices),
                         vertices: chunkVertices
                     });
                 }
@@ -304,8 +304,9 @@ var Bodies = {};
         if (parts.length > 1) {
             // create the parent body to be returned, that contains generated compound parts
             body = Body.create(Common.extend({ parts: parts.slice(0) }, options));
-            Body.setPosition(body, { x: x, y: y });
-
+            Body.translate(body, { x: x, y: y });
+            body.position.x = x;
+            body.position.y = y;
             return body;
         } else {
             return parts[0];

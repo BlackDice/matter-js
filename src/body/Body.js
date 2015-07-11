@@ -297,7 +297,7 @@ var Body = {};
         Body.setMass(body, body.density * body.area);
 
         // orient vertices around the centre of mass at origin (0, 0)
-        var centre = Vertices.centre(body.vertices);
+        var centre = Vertices.boundsCentre(body.vertices);
         Vertices.translate(body.vertices, centre, -1);
 
         // update inertia while vertices are at origin (0, 0)

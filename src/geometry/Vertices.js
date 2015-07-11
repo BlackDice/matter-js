@@ -91,6 +91,19 @@ var Vertices = {};
     };
 
     /**
+     * Returns centre of the set of vertices based on bounds.
+     * @method boundsCentre
+     * @param {vertices} vertices
+     * @return {vector} The centre point
+     */
+    Vertices.boundsCentre = function(vertices) {
+        bounds = Bounds.create(vertices);
+        var centre = Vector.add(bounds.min, bounds.max);
+        centre = Vector.div(centre, 2);
+        return centre;
+    };
+
+    /**
      * Returns the average (mean) of the set of vertices.
      * @method mean
      * @param {vertices} vertices
@@ -236,7 +249,7 @@ var Vertices = {};
         if (scaleX === 1 && scaleY === 1)
             return vertices;
 
-        point = point || Vertices.centre(vertices);
+        point = point || Vertices.boundsCentre(vertices);
 
         var vertex,
             delta;
