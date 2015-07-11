@@ -97,7 +97,7 @@ var Vertices = {};
      * @return {vector} The centre point
      */
     Vertices.boundsCentre = function(vertices) {
-        bounds = Bounds.create(vertices);
+        var bounds = Bounds.create(vertices);
         var centre = Vector.add(bounds.min, bounds.max);
         centre = Vector.div(centre, 2);
         return centre;
