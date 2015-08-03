@@ -1,8 +1,8 @@
 /**
-* The `Matter.Bodies` module contains factory methods for creating rigid body models 
+* The `Matter.Bodies` module contains factory methods for creating rigid body models
 * with commonly used body configurations (such as rectangles, circles and other polygons).
 *
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
+* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js)
 * and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
 *
 * @class Bodies
@@ -15,7 +15,7 @@ var Bodies = {};
 (function() {
 
     /**
-     * Creates a new rigid body model with a rectangle hull. 
+     * Creates a new rigid body model with a rectangle hull.
      * The options parameter is an object that specifies any properties you wish to override the defaults.
      * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
      * @method rectangle
@@ -29,7 +29,7 @@ var Bodies = {};
     Bodies.rectangle = function(x, y, width, height, options) {
         options = options || {};
 
-        var rectangle = { 
+        var rectangle = {
             label: 'Rectangle Body',
             position: { x: x, y: y },
             vertices: Vertices.fromPath('L 0 0 L ' + width + ' 0 L ' + width + ' ' + height + ' L 0 ' + height)
@@ -37,16 +37,16 @@ var Bodies = {};
 
         if (options.chamfer) {
             var chamfer = options.chamfer;
-            rectangle.vertices = Vertices.chamfer(rectangle.vertices, chamfer.radius, 
+            rectangle.vertices = Vertices.chamfer(rectangle.vertices, chamfer.radius,
                                     chamfer.quality, chamfer.qualityMin, chamfer.qualityMax);
             delete options.chamfer;
         }
 
         return Body.create(Common.extend({}, rectangle, options));
     };
-    
+
     /**
-     * Creates a new rigid body model with a trapezoid hull. 
+     * Creates a new rigid body model with a trapezoid hull.
      * The options parameter is an object that specifies any properties you wish to override the defaults.
      * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
      * @method trapezoid
@@ -63,12 +63,12 @@ var Bodies = {};
 
         slope *= 0.5;
         var roof = (1 - (slope * 2)) * width;
-        
+
         var x1 = width * slope,
             x2 = x1 + roof,
             x3 = x2 + x1;
 
-        var trapezoid = { 
+        var trapezoid = {
             label: 'Trapezoid Body',
             position: { x: x, y: y },
             vertices: Vertices.fromPath('L 0 0 L ' + x1 + ' ' + (-height) + ' L ' + x2 + ' ' + (-height) + ' L ' + x3 + ' 0')
@@ -76,7 +76,7 @@ var Bodies = {};
 
         if (options.chamfer) {
             var chamfer = options.chamfer;
-            trapezoid.vertices = Vertices.chamfer(trapezoid.vertices, chamfer.radius, 
+            trapezoid.vertices = Vertices.chamfer(trapezoid.vertices, chamfer.radius,
                                     chamfer.quality, chamfer.qualityMin, chamfer.qualityMax);
             delete options.chamfer;
         }
@@ -85,7 +85,7 @@ var Bodies = {};
     };
 
     /**
-     * Creates a new rigid body model with a circle hull. 
+     * Creates a new rigid body model with a circle hull.
      * The options parameter is an object that specifies any properties you wish to override the defaults.
      * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
      * @method circle
@@ -99,15 +99,19 @@ var Bodies = {};
     Bodies.circle = function(x, y, radius, options, maxSides) {
         options = options || {};
         options.label = 'Circle Body';
-        
+
         // approximate circles with polygons until true circles implemented in SAT
 
-        maxSides = maxSides || 25;
+        maxSides = maxSides || 24;
         var sides = Math.ceil(Math.max(10, Math.min(maxSides, radius)));
 
         // optimisation: always use even number of sides (half the number of unique axes)
         if (sides % 2 === 1)
             sides += 1;
+
+        // round to nearest divisible by four, so you get the same width and height
+        division = Math.floor(sides / 4);
+        sides = division * 4;
 
         // flag for better rendering
         options.circleRadius = radius;
@@ -116,7 +120,7 @@ var Bodies = {};
     };
 
     /**
-     * Creates a new rigid body model with a regular polygon hull with the given number of sides. 
+     * Creates a new rigid body model with a regular polygon hull with the given number of sides.
      * The options parameter is an object that specifies any properties you wish to override the defaults.
      * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
      * @method polygon
@@ -135,7 +139,7 @@ var Bodies = {};
 
         var theta = 2 * Math.PI / sides,
             path = '',
-            offset = theta * 0.5;
+            offset = 0; //theta * 0.5;
 
         for (var i = 0; i < sides; i += 1) {
             var angle = offset + (i * theta),
@@ -145,7 +149,7 @@ var Bodies = {};
             path += 'L ' + xx.toFixed(3) + ' ' + yy.toFixed(3) + ' ';
         }
 
-        var polygon = { 
+        var polygon = {
             label: 'Polygon Body',
             position: { x: x, y: y },
             vertices: Vertices.fromPath(path)
@@ -153,7 +157,7 @@ var Bodies = {};
 
         if (options.chamfer) {
             var chamfer = options.chamfer;
-            polygon.vertices = Vertices.chamfer(polygon.vertices, chamfer.radius, 
+            polygon.vertices = Vertices.chamfer(polygon.vertices, chamfer.radius,
                                     chamfer.quality, chamfer.qualityMin, chamfer.qualityMax);
             delete options.chamfer;
         }
