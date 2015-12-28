@@ -4,13 +4,18 @@
 * It is important to use the functions in this module to modify composites, rather than directly modifying their properties.
 * Note that the `Matter.World` object is also a type of `Matter.Composite` and as such all composite methods here can also operate on a `Matter.World`.
 *
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
+* See the included usage [examples](https://github.com/liabru/matter-js/tree/master/examples).
 *
 * @class Composite
 */
 
 var Composite = {};
+
+module.exports = Composite;
+
+var Events = require('../core/Events');
+var Common = require('../core/Common');
+var Body = require('./Body');
 
 (function() {
 
@@ -146,7 +151,7 @@ var Composite = {};
     };
 
     /**
-     * Adds a composite to the given composite
+     * Adds a composite to the given composite.
      * @private
      * @method addComposite
      * @param {composite} compositeA
@@ -161,7 +166,7 @@ var Composite = {};
     };
 
     /**
-     * Removes a composite from the given composite, and optionally searching its children recursively
+     * Removes a composite from the given composite, and optionally searching its children recursively.
      * @private
      * @method removeComposite
      * @param {composite} compositeA
@@ -186,7 +191,7 @@ var Composite = {};
     };
 
     /**
-     * Removes a composite from the given composite
+     * Removes a composite from the given composite.
      * @private
      * @method removeCompositeAt
      * @param {composite} composite
@@ -200,7 +205,7 @@ var Composite = {};
     };
 
     /**
-     * Adds a body to the given composite
+     * Adds a body to the given composite.
      * @private
      * @method addBody
      * @param {composite} composite
@@ -214,7 +219,7 @@ var Composite = {};
     };
 
     /**
-     * Removes a body from the given composite, and optionally searching its children recursively
+     * Removes a body from the given composite, and optionally searching its children recursively.
      * @private
      * @method removeBody
      * @param {composite} composite
@@ -239,7 +244,7 @@ var Composite = {};
     };
 
     /**
-     * Removes a body from the given composite
+     * Removes a body from the given composite.
      * @private
      * @method removeBodyAt
      * @param {composite} composite
@@ -253,7 +258,7 @@ var Composite = {};
     };
 
     /**
-     * Adds a constraint to the given composite
+     * Adds a constraint to the given composite.
      * @private
      * @method addConstraint
      * @param {composite} composite
@@ -267,7 +272,7 @@ var Composite = {};
     };
 
     /**
-     * Removes a constraint from the given composite, and optionally searching its children recursively
+     * Removes a constraint from the given composite, and optionally searching its children recursively.
      * @private
      * @method removeConstraint
      * @param {composite} composite
@@ -291,7 +296,7 @@ var Composite = {};
     };
 
     /**
-     * Removes a body from the given composite
+     * Removes a body from the given composite.
      * @private
      * @method removeConstraintAt
      * @param {composite} composite
@@ -305,8 +310,8 @@ var Composite = {};
     };
 
     /**
-     * Removes all bodies, constraints and composites from the given composite
-     * Optionally clearing its children recursively
+     * Removes all bodies, constraints and composites from the given composite.
+     * Optionally clearing its children recursively.
      * @method clear
      * @param {composite} composite
      * @param {boolean} keepStatic
@@ -333,7 +338,7 @@ var Composite = {};
     };
 
     /**
-     * Returns all bodies in the given composite, including all bodies in its children, recursively
+     * Returns all bodies in the given composite, including all bodies in its children, recursively.
      * @method allBodies
      * @param {composite} composite
      * @return {body[]} All the bodies
@@ -348,7 +353,7 @@ var Composite = {};
     };
 
     /**
-     * Returns all constraints in the given composite, including all constraints in its children, recursively
+     * Returns all constraints in the given composite, including all constraints in its children, recursively.
      * @method allConstraints
      * @param {composite} composite
      * @return {constraint[]} All the constraints
@@ -363,7 +368,7 @@ var Composite = {};
     };
 
     /**
-     * Returns all composites in the given composite, including all composites in its children, recursively
+     * Returns all composites in the given composite, including all composites in its children, recursively.
      * @method allComposites
      * @param {composite} composite
      * @return {composite[]} All the composites
@@ -378,7 +383,7 @@ var Composite = {};
     };
 
     /**
-     * Searches the composite recursively for an object matching the type and id supplied, null if not found
+     * Searches the composite recursively for an object matching the type and id supplied, null if not found.
      * @method get
      * @param {composite} composite
      * @param {number} id
@@ -412,7 +417,7 @@ var Composite = {};
     };
 
     /**
-     * Moves the given object(s) from compositeA to compositeB (equal to a remove followed by an add)
+     * Moves the given object(s) from compositeA to compositeB (equal to a remove followed by an add).
      * @method move
      * @param {compositeA} compositeA
      * @param {object[]} objects
@@ -426,7 +431,7 @@ var Composite = {};
     };
 
     /**
-     * Assigns new ids for all objects in the composite, recursively
+     * Assigns new ids for all objects in the composite, recursively.
      * @method rebase
      * @param {composite} composite
      * @return {composite} Returns composite

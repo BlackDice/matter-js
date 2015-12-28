@@ -1,10 +1,12 @@
 /**
-* _Internal Class_, not generally used outside of the engine's internals.
+* The `Matter.Common` module contains utility functions that are common to all modules.
 *
 * @class Common
 */
 
 var Common = {};
+
+module.exports = Common;
 
 (function() {
 
@@ -12,7 +14,7 @@ var Common = {};
     Common._seed = 0;
 
     /**
-     * Description
+     * Extends the object in the first argument using the object in the second argument.
      * @method extend
      * @param {} obj
      * @param {boolean} deep
@@ -56,7 +58,7 @@ var Common = {};
     };
 
     /**
-     * Creates a new clone of the object, if deep is true references will also be cloned
+     * Creates a new clone of the object, if deep is true references will also be cloned.
      * @method clone
      * @param {} obj
      * @param {bool} deep
@@ -67,7 +69,7 @@ var Common = {};
     };
 
     /**
-     * Description
+     * Returns the list of keys for the given object.
      * @method keys
      * @param {} obj
      * @return {string[]} keys
@@ -84,7 +86,7 @@ var Common = {};
     };
 
     /**
-     * Description
+     * Returns the list of values for the given object.
      * @method values
      * @param {} obj
      * @return {array} Array of the objects property values
@@ -107,11 +109,11 @@ var Common = {};
     };
 
     /**
-     * Description
+     * Returns a hex colour string made by lightening or darkening color by percent.
      * @method shadeColor
      * @param {string} color
      * @param {number} percent
-     * @return {string} A hex colour string made by lightening or darkening color by percent
+     * @return {string} A hex colour
      */
     Common.shadeColor = function(color, percent) {   
         // http://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color
@@ -126,7 +128,8 @@ var Common = {};
     };
 
     /**
-     * Description
+     * Shuffles the given array in-place.
+     * The function uses a seeded random generator.
      * @method shuffle
      * @param {array} array
      * @return {array} array shuffled randomly
@@ -142,7 +145,8 @@ var Common = {};
     };
 
     /**
-     * Description
+     * Randomly chooses a value from a list with equal probability.
+     * The function uses a seeded random generator.
      * @method choose
      * @param {array} choices
      * @return {object} A random choice object from the array
@@ -152,7 +156,7 @@ var Common = {};
     };
 
     /**
-     * Description
+     * Returns true if the object is a HTMLElement, otherwise false.
      * @method isElement
      * @param {object} obj
      * @return {boolean} True if the object is a HTMLElement, otherwise false
@@ -170,7 +174,7 @@ var Common = {};
     };
 
     /**
-     * Description
+     * Returns true if the object is an array.
      * @method isArray
      * @param {object} obj
      * @return {boolean} True if the object is an array, otherwise false
@@ -180,7 +184,7 @@ var Common = {};
     };
     
     /**
-     * Description
+     * Returns the given value clamped between a minimum and maximum value.
      * @method clamp
      * @param {number} value
      * @param {number} min
@@ -196,7 +200,7 @@ var Common = {};
     };
     
     /**
-     * Description
+     * Returns the sign of the given value.
      * @method sign
      * @param {number} value
      * @return {number} -1 if negative, +1 if 0 or positive
@@ -206,7 +210,7 @@ var Common = {};
     };
     
     /**
-     * Description
+     * Returns the current timestamp (high-res if available).
      * @method now
      * @return {number} the current timestamp (high-res if available)
      */
@@ -230,7 +234,8 @@ var Common = {};
 
     
     /**
-     * Description
+     * Returns a random value between a minimum and a maximum value inclusive.
+     * The function uses a seeded random generator.
      * @method random
      * @param {number} min
      * @param {number} max
@@ -243,7 +248,7 @@ var Common = {};
     };
 
     /**
-     * Converts a CSS hex colour string into an integer
+     * Converts a CSS hex colour string into an integer.
      * @method colorToNumber
      * @param {string} colorString
      * @return {number} An integer representing the CSS hex string
@@ -261,7 +266,7 @@ var Common = {};
     };
 
     /**
-     * A wrapper for console.log, for providing errors and warnings
+     * A wrapper for console.log, for providing errors and warnings.
      * @method log
      * @param {string} message
      * @param {string} type
@@ -283,7 +288,7 @@ var Common = {};
     };
 
     /**
-     * Returns the next unique sequential ID
+     * Returns the next unique sequential ID.
      * @method nextId
      * @return {Number} Unique sequential ID
      */
@@ -292,7 +297,7 @@ var Common = {};
     };
 
     /**
-     * A cross browser compatible indexOf implementation
+     * A cross browser compatible indexOf implementation.
      * @method indexOf
      * @param {array} haystack
      * @param {object} needle

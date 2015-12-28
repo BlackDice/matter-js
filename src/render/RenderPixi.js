@@ -1,11 +1,15 @@
 /**
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
+* See the included usage [examples](https://github.com/liabru/matter-js/tree/master/examples).
 *
 * @class RenderPixi
 */
 
 var RenderPixi = {};
+
+module.exports = RenderPixi;
+
+var Composite = require('../body/Composite');
+var Common = require('../core/Common');
 
 (function() {
     
@@ -355,8 +359,8 @@ var RenderPixi = {};
             texture = _getTexture(render, texturePath),
             sprite = new PIXI.Sprite(texture);
 
-        sprite.anchor.x = 0.5;
-        sprite.anchor.y = 0.5;
+        sprite.anchor.x = body.render.sprite.xOffset;
+        sprite.anchor.y = body.render.sprite.yOffset;
 
         return sprite;
     };

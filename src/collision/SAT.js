@@ -1,5 +1,5 @@
 /**
-* _Internal Class_, not generally used outside of the engine's internals.
+* The `Matter.SAT` module contains methods for detecting collisions using the Separating Axis Theorem.
 *
 * @class SAT
 */
@@ -8,10 +8,15 @@
 
 var SAT = {};
 
+module.exports = SAT;
+
+var Vertices = require('../geometry/Vertices');
+var Vector = require('../geometry/Vector');
+
 (function() {
 
     /**
-     * Description
+     * Detect collision between two bodies using the Separating Axis Theorem.
      * @method collides
      * @param {body} bodyA
      * @param {body} bodyB
@@ -141,7 +146,7 @@ var SAT = {};
     };
 
     /**
-     * Description
+     * Find the overlap between two sets of vertices.
      * @method _overlapAxes
      * @private
      * @param {} verticesA
@@ -180,7 +185,7 @@ var SAT = {};
     };
 
     /**
-     * Description
+     * Projects vertices on an axis and returns an interval.
      * @method _projectToAxis
      * @private
      * @param {} projection
@@ -206,13 +211,13 @@ var SAT = {};
     };
     
     /**
-     * Description
+     * Finds supporting vertices given two bodies along a given direction using hill-climbing.
      * @method _findSupports
      * @private
      * @param {} bodyA
      * @param {} bodyB
      * @param {} normal
-     * @return ArrayExpression
+     * @return [vector]
      */
     var _findSupports = function(bodyA, bodyB, normal) {
         var nearestDistance = Number.MAX_VALUE,

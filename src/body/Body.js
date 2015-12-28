@@ -3,21 +3,29 @@
 * A `Matter.Body` is a rigid body that can be simulated by a `Matter.Engine`.
 * Factories for commonly used body configurations (such as rectangles, circles and other polygons) can be found in the module `Matter.Bodies`.
 *
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
+* See the included usage [examples](https://github.com/liabru/matter-js/tree/master/examples).
 
 * @class Body
 */
 
 var Body = {};
 
+module.exports = Body;
+
+var Vertices = require('../geometry/Vertices');
+var Vector = require('../geometry/Vector');
+var Sleeping = require('../core/Sleeping');
+var Render = require('../render/Render');
+var Common = require('../core/Common');
+var Bounds = require('../geometry/Bounds');
+var Axes = require('../geometry/Axes');
+
 (function() {
 
     Body._inertiaScale = 4;
-
-    var _nextCollidingGroupId = 1,
-        _nextNonCollidingGroupId = -1,
-        _nextCategory = 0x0001;
+    Body._nextCollidingGroupId = 1;
+    Body._nextNonCollidingGroupId = -1;
+    Body._nextCategory = 0x0001;
 
     /**
      * Creates a new rigid body model. The options parameter is an object that specifies any properties you wish to override the defaults.
@@ -65,7 +73,9 @@ var Body = {};
                 visible: true,
                 sprite: {
                     xScale: 1,
-                    yScale: 1
+                    yScale: 1,
+                    xOffset: 0,
+                    yOffset: 0
                 },
                 lineWidth: 1.5
             }
@@ -88,9 +98,9 @@ var Body = {};
      */
     Body.nextGroup = function(isNonColliding) {
         if (isNonColliding)
-            return _nextNonCollidingGroupId--;
+            return Body._nextNonCollidingGroupId--;
 
-        return _nextCollidingGroupId++;
+        return Body._nextCollidingGroupId++;
     };
 
     /**
@@ -100,8 +110,8 @@ var Body = {};
      * @return {Number} Unique category bitfield
      */
     Body.nextCategory = function() {
-        _nextCategory = _nextCategory << 1;
-        return _nextCategory;
+        Body._nextCategory = Body._nextCategory << 1;
+        return Body._nextCategory;
     };
 
     /**
@@ -141,6 +151,8 @@ var Body = {};
             defaultStrokeStyle = Common.shadeColor(defaultFillStyle, -20);
         body.render.fillStyle = body.render.fillStyle || defaultFillStyle;
         body.render.strokeStyle = body.render.strokeStyle || defaultStrokeStyle;
+        body.render.sprite.xOffset += -(body.bounds.min.x - body.position.x) / (body.bounds.max.x - body.bounds.min.x);
+        body.render.sprite.yOffset += -(body.bounds.min.y - body.position.y) / (body.bounds.max.y - body.bounds.min.y);
     };
 
     /**
@@ -260,7 +272,7 @@ var Body = {};
     };
 
     /**
-     * Sets the moment of inertia (i.e. second moment of area) of the body of the body. 
+     * Sets the moment of inertia (i.e. second moment of area) of the body of the body.
      * Inverse inertia is automatically updated to reflect the change. Mass is not changed.
      * @method setInertia
      * @param {body} body
@@ -538,7 +550,7 @@ var Body = {};
             var part = body.parts[i];
 
             Vertices.translate(part.vertices, body.velocity);
-            
+
             if (i > 0) {
                 part.position.x += body.velocity.x;
                 part.position.y += body.velocity.y;
@@ -567,7 +579,7 @@ var Body = {};
         body.force.x += force.x;
         body.force.y += force.y;
         var offset = { x: position.x - body.position.x, y: position.y - body.position.y };
-        body.torque += (offset.x * force.y - offset.y * force.x) * body.inverseInertia;
+        body.torque += offset.x * force.y - offset.y * force.x;
     };
 
     /**
@@ -594,11 +606,11 @@ var Body = {};
             properties.mass += part.mass;
             properties.area += part.area;
             properties.inertia += part.inertia;
-            properties.centre = Vector.add(properties.centre, 
+            properties.centre = Vector.add(properties.centre,
                                            Vector.mult(part.position, part.mass !== Infinity ? part.mass : 1));
         }
 
-        properties.centre = Vector.div(properties.centre, 
+        properties.centre = Vector.div(properties.centre,
                                        properties.mass !== Infinity ? properties.mass : body.parts.length);
 
         return properties;
@@ -660,7 +672,7 @@ var Body = {};
      */
 
     /**
-     * An array of bodies that make up this body. 
+     * An array of bodies that make up this body.
      * The first body in the array must always be a self reference to the current body instance.
      * All bodies in the `parts` array together form a single rigid compound body.
      * Parts are allowed to overlap, have gaps or holes or even form concave bodies.
@@ -695,7 +707,7 @@ var Body = {};
      *     [{ x: 0, y: 0 }, { x: 25, y: 50 }, { x: 50, y: 0 }]
      *
      * When passed via `Body.create`, the vertices are translated relative to `body.position` (i.e. world-space, and constantly updated by `Body.update` during simulation).
-     * The `Vector` objects are also augmented with additional properties required for efficient collision detection. 
+     * The `Vector` objects are also augmented with additional properties required for efficient collision detection.
      *
      * Other properties such as `inertia` and `bounds` are automatically calculated from the passed vertices (unless provided via `options`).
      * Concave hulls are not currently supported. The module `Matter.Vertices` contains useful methods for working with vertices.
@@ -747,7 +759,7 @@ var Body = {};
      */
 
     /**
-     * A `Vector` that _measures_ the current velocity of the body after the last `Body.update`. It is read-only. 
+     * A `Vector` that _measures_ the current velocity of the body after the last `Body.update`. It is read-only.
      * If you need to modify a body's velocity directly, you should either apply a force or simply change the body's `position` (as the engine uses position-Verlet integration).
      *
      * @readOnly
@@ -757,7 +769,7 @@ var Body = {};
      */
 
     /**
-     * A `Number` that _measures_ the current angular velocity of the body after the last `Body.update`. It is read-only. 
+     * A `Number` that _measures_ the current angular velocity of the body after the last `Body.update`. It is read-only.
      * If you need to modify a body's angular velocity directly, you should apply a torque or simply change the body's `angle` (as the engine uses position-Verlet integration).
      *
      * @readOnly
@@ -847,7 +859,7 @@ var Body = {};
 
     /**
      * A `Number` that defines the restitution (elasticity) of the body. The value is always positive and is in the range `(0, 1)`.
-     * A value of `0` means collisions may be perfectly inelastic and no bouncing may occur. 
+     * A value of `0` means collisions may be perfectly inelastic and no bouncing may occur.
      * A value of `0.8` means the body may bounce back with approximately 80% of its kinetic energy.
      * Note that collision response is based on _pairs_ of bodies, and that `restitution` values are _combined_ with the following formula:
      *
@@ -863,7 +875,7 @@ var Body = {};
      * A value of `0` means that the body may slide indefinitely.
      * A value of `1` means the body may come to a stop almost instantly after a force is applied.
      *
-     * The effects of the value may be non-linear. 
+     * The effects of the value may be non-linear.
      * High values may be unstable depending on the body.
      * The engine uses a Coulomb friction model including static and kinetic friction.
      * Note that collision response is based on _pairs_ of bodies, and that `friction` values are _combined_ with the following formula:
@@ -876,7 +888,7 @@ var Body = {};
      */
 
     /**
-     * A `Number` that defines the static friction of the body (in the Coulomb friction model). 
+     * A `Number` that defines the static friction of the body (in the Coulomb friction model).
      * A value of `0` means the body will never 'stick' when it is nearly stationary and only dynamic `friction` is used.
      * The higher the value (e.g. `10`), the more force it will take to initially get the body moving when nearly stationary.
      * This value is multiplied with the `friction` property to make it easier to change `friction` and maintain an appropriate amount of static friction.
@@ -887,10 +899,10 @@ var Body = {};
      */
 
     /**
-     * A `Number` that defines the air friction of the body (air resistance). 
+     * A `Number` that defines the air friction of the body (air resistance).
      * A value of `0` means the body will never slow as it moves through space.
      * The higher the value, the faster a body slows when moving through space.
-     * The effects of the value are non-linear. 
+     * The effects of the value are non-linear.
      *
      * @property frictionAir
      * @type number
@@ -998,7 +1010,7 @@ var Body = {};
      * @property render.sprite.texture
      * @type string
      */
-     
+
     /**
      * A `Number` that defines the scaling in the x-axis for the sprite, if any.
      *
@@ -1014,6 +1026,22 @@ var Body = {};
      * @type number
      * @default 1
      */
+
+     /**
+      * A `Number` that defines the offset in the x-axis for the sprite (normalised by texture width).
+      *
+      * @property render.sprite.xOffset
+      * @type number
+      * @default 0
+      */
+
+     /**
+      * A `Number` that defines the offset in the y-axis for the sprite (normalised by texture height).
+      *
+      * @property render.sprite.yOffset
+      * @type number
+      * @default 0
+      */
 
     /**
      * A `Number` that defines the line width to use when rendering the body outline (if a sprite is not defined).
@@ -1050,13 +1078,13 @@ var Body = {};
      * @property axes
      * @type vector[]
      */
-     
+
     /**
      * A `Number` that _measures_ the area of the body's convex hull, calculated at creation by `Body.create`.
      *
      * @property area
      * @type string
-     * @default 
+     * @default
      */
 
     /**

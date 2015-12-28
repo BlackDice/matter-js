@@ -3,8 +3,7 @@
 * Constraints are used for specifying that a fixed distance must be maintained between two bodies (or a body and a fixed world-space position).
 * The stiffness of constraints can be modified to create springs or elastic.
 *
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
+* See the included usage [examples](https://github.com/liabru/matter-js/tree/master/examples).
 *
 * @class Constraint
 */
@@ -18,6 +17,15 @@
 // TODO: impulse caching and warming
 
 var Constraint = {};
+
+module.exports = Constraint;
+
+var Vertices = require('../geometry/Vertices');
+var Vector = require('../geometry/Vector');
+var Sleeping = require('../core/Sleeping');
+var Bounds = require('../geometry/Bounds');
+var Axes = require('../geometry/Axes');
+var Common = require('../core/Common');
 
 (function() {
 
@@ -70,7 +78,7 @@ var Constraint = {};
     };
 
     /**
-     * Description
+     * Solves all constraints in a list of collisions.
      * @private
      * @method solveAll
      * @param {constraint[]} constraints
@@ -83,7 +91,7 @@ var Constraint = {};
     };
 
     /**
-     * Description
+     * Solves a distance constraint with Gauss-Siedel method.
      * @private
      * @method solve
      * @param {constraint} constraint
@@ -198,12 +206,6 @@ var Constraint = {};
         if (bodyA && !bodyA.isStatic) {
             torque = Vector.cross(offsetA, normalVelocity) * bodyA.inverseInertia * (1 - constraint.angularStiffness);
 
-            Sleeping.set(bodyA, false);
-            
-            // clamp to prevent instability
-            // TODO: solve this properly
-            torque = Common.clamp(torque, -0.01, 0.01);
-
             // keep track of applied impulses for post solving
             bodyA.constraintImpulse.x -= force.x;
             bodyA.constraintImpulse.y -= force.y;
@@ -217,12 +219,6 @@ var Constraint = {};
 
         if (bodyB && !bodyB.isStatic) {
             torque = Vector.cross(offsetB, normalVelocity) * bodyB.inverseInertia * (1 - constraint.angularStiffness);
-
-            Sleeping.set(bodyB, false);
-            
-            // clamp to prevent instability
-            // TODO: solve this properly
-            torque = Common.clamp(torque, -0.01, 0.01);
 
             // keep track of applied impulses for post solving
             bodyB.constraintImpulse.x += force.x;
@@ -238,7 +234,7 @@ var Constraint = {};
     };
 
     /**
-     * Performs body updates required after solving constraints
+     * Performs body updates required after solving constraints.
      * @private
      * @method postSolveAll
      * @param {body[]} bodies
@@ -247,6 +243,12 @@ var Constraint = {};
         for (var i = 0; i < bodies.length; i++) {
             var body = bodies[i],
                 impulse = body.constraintImpulse;
+
+            if (impulse.x === 0 && impulse.y === 0 && impulse.angle === 0) {
+                continue;
+            }
+
+            Sleeping.set(body, false);
 
             // update geometry and reset
             for (var j = 0; j < body.parts.length; j++) {
@@ -267,7 +269,7 @@ var Constraint = {};
                     }
                 }
 
-                Bounds.update(part.bounds, part.vertices);
+                Bounds.update(part.bounds, part.vertices, body.velocity);
             }
 
             impulse.angle = 0;

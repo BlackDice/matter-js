@@ -1,16 +1,21 @@
 /**
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
+* The `Matter.Grid` module contains methods for creating and manipulating collision broadphase grid structures.
 *
 * @class Grid
 */
 
 var Grid = {};
 
+module.exports = Grid;
+
+var Pair = require('./Pair');
+var Detector = require('./Detector');
+var Common = require('../core/Common');
+
 (function() {
 
     /**
-     * Description
+     * Creates a new grid.
      * @method create
      * @param {} options
      * @return {grid} A new grid
@@ -30,7 +35,7 @@ var Grid = {};
     };
 
     /**
-     * Description
+     * Updates the grid.
      * @method update
      * @param {grid} grid
      * @param {body[]} bodies
@@ -119,7 +124,7 @@ var Grid = {};
     };
 
     /**
-     * Description
+     * Clears the grid.
      * @method clear
      * @param {grid} grid
      */
@@ -130,12 +135,12 @@ var Grid = {};
     };
 
     /**
-     * Description
+     * Finds the union of two regions.
      * @method _regionUnion
      * @private
      * @param {} regionA
      * @param {} regionB
-     * @return CallExpression
+     * @return {} region
      */
     var _regionUnion = function(regionA, regionB) {
         var startCol = Math.min(regionA.startCol, regionB.startCol),
@@ -147,12 +152,12 @@ var Grid = {};
     };
 
     /**
-     * Description
+     * Gets the region a given body falls in for a given grid.
      * @method _getRegion
      * @private
      * @param {} grid
      * @param {} body
-     * @return CallExpression
+     * @return {} region
      */
     var _getRegion = function(grid, body) {
         var bounds = body.bounds,
@@ -165,14 +170,14 @@ var Grid = {};
     };
 
     /**
-     * Description
+     * Creates a region.
      * @method _createRegion
      * @private
      * @param {} startCol
      * @param {} endCol
      * @param {} startRow
      * @param {} endRow
-     * @return ObjectExpression
+     * @return {} region
      */
     var _createRegion = function(startCol, endCol, startRow, endRow) {
         return { 
@@ -185,24 +190,24 @@ var Grid = {};
     };
 
     /**
-     * Description
+     * Gets the bucket id at the given position.
      * @method _getBucketId
      * @private
      * @param {} column
      * @param {} row
-     * @return BinaryExpression
+     * @return {string} bucket id
      */
     var _getBucketId = function(column, row) {
         return column + ',' + row;
     };
 
     /**
-     * Description
+     * Creates a bucket.
      * @method _createBucket
      * @private
      * @param {} buckets
      * @param {} bucketId
-     * @return bucket
+     * @return {} bucket
      */
     var _createBucket = function(buckets, bucketId) {
         var bucket = buckets[bucketId] = [];
@@ -210,7 +215,7 @@ var Grid = {};
     };
 
     /**
-     * Description
+     * Adds a body to a bucket.
      * @method _bucketAddBody
      * @private
      * @param {} grid
@@ -242,7 +247,7 @@ var Grid = {};
     };
 
     /**
-     * Description
+     * Removes a body from a bucket.
      * @method _bucketRemoveBody
      * @private
      * @param {} grid
@@ -267,11 +272,11 @@ var Grid = {};
     };
 
     /**
-     * Description
+     * Generates a list of the active pairs in the grid.
      * @method _createActivePairsList
      * @private
      * @param {} grid
-     * @return pairs
+     * @return [] pairs
      */
     var _createActivePairsList = function(grid) {
         var pairKeys,

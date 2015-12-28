@@ -6,16 +6,21 @@
 
 var Metrics = {};
 
+module.exports = Metrics;
+
+var Composite = require('../body/Composite');
+var Common = require('./Common');
+
 (function() {
 
     /**
-     * Description
+     * Creates a new metrics.
      * @method create
      * @private
      * @return {metrics} A new metrics
      */
-    Metrics.create = function() {
-        return {
+    Metrics.create = function(options) {
+        var defaults = {
             extended: false,
             narrowDetections: 0,
             narrowphaseTests: 0,
@@ -31,10 +36,12 @@ var Metrics = {};
             bodies: 0,
             pairs: 0
         };
+
+        return Common.extend(defaults, false, options);
     };
 
     /**
-     * Description
+     * Resets metrics.
      * @method reset
      * @private
      * @param {metrics} metrics
@@ -58,7 +65,7 @@ var Metrics = {};
     };
 
     /**
-     * Description
+     * Updates metrics.
      * @method update
      * @private
      * @param {metrics} metrics

@@ -1,5 +1,5 @@
 /**
-* _Internal Class_, not generally used outside of the engine's internals.
+* The `Matter.Detector` module contains methods for detecting collisions given a set of pairs.
 *
 * @class Detector
 */
@@ -8,10 +8,16 @@
 
 var Detector = {};
 
+module.exports = Detector;
+
+var SAT = require('./SAT');
+var Pair = require('./Pair');
+var Bounds = require('../geometry/Bounds');
+
 (function() {
 
     /**
-     * Description
+     * Finds all collisions given a list of pairs.
      * @method collisions
      * @param {pair[]} broadphasePairs
      * @param {engine} engine
@@ -75,74 +81,6 @@ var Detector = {};
                                 // @endif
                             }
                         }
-                    }
-                }
-            }
-        }
-
-        return collisions;
-    };
-
-    /**
-     * Description
-     * @method bruteForce
-     * @param {body[]} bodies
-     * @param {engine} engine
-     * @return {array} collisions
-     */
-    Detector.bruteForce = function(bodies, engine) {
-        var collisions = [],
-            pairsTable = engine.pairs.table;
-
-        // @if DEBUG
-        var metrics = engine.metrics;
-        // @endif
-
-        for (var i = 0; i < bodies.length; i++) {
-            for (var j = i + 1; j < bodies.length; j++) {
-                var bodyA = bodies[i], 
-                    bodyB = bodies[j];
-
-                // NOTE: could share a function for the below, but may drop performance?
-
-                if ((bodyA.isStatic || bodyA.isSleeping) && (bodyB.isStatic || bodyB.isSleeping))
-                    continue;
-                
-                if (!Detector.canCollide(bodyA.collisionFilter, bodyB.collisionFilter))
-                    continue;
-
-                // @if DEBUG
-                metrics.midphaseTests += 1;
-                // @endif
-
-                // mid phase
-                if (Bounds.overlaps(bodyA.bounds, bodyB.bounds)) {
-
-                    // find a previous collision we could reuse
-                    var pairId = Pair.id(bodyA, bodyB),
-                        pair = pairsTable[pairId],
-                        previousCollision;
-
-                    if (pair && pair.isActive) {
-                        previousCollision = pair.collision;
-                    } else {
-                        previousCollision = null;
-                    }
-
-                    // narrow phase
-                    var collision = SAT.collides(bodyA, bodyB, previousCollision);
-
-                    // @if DEBUG
-                    metrics.narrowphaseTests += 1;
-                    if (collision.reused)
-                        metrics.narrowReuseCount += 1;
-                    // @endif
-
-                    if (collision.collided) {
-                        collisions.push(collision);
-                        // @if DEBUG
-                        metrics.narrowDetections += 1;
-                        // @endif
                     }
                 }
             }

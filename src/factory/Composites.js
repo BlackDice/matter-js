@@ -1,16 +1,27 @@
 /**
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
+* The `Matter.Composites` module contains factory methods for creating composite bodies
+* with commonly used configurations (such as stacks and chains).
+*
+* See the included usage [examples](https://github.com/liabru/matter-js/tree/master/examples).
 *
 * @class Composites
 */
 
 var Composites = {};
 
+module.exports = Composites;
+
+var Composite = require('../body/Composite');
+var Constraint = require('../constraint/Constraint');
+var Common = require('../core/Common');
+var Body = require('../body/Body');
+var Bodies = require('./Bodies');
+
 (function() {
 
     /**
-     * Description
+     * Create a new composite containing bodies created in the callback in a grid arrangement.
+     * This function uses the body's bounds to prevent overlaps.
      * @method stack
      * @param {number} xx
      * @param {number} yy
@@ -62,7 +73,7 @@ var Composites = {};
     };
     
     /**
-     * Description
+     * Chains all bodies in the given composite together using constraints.
      * @method chain
      * @param {composite} composite
      * @param {number} xOffsetA
@@ -101,7 +112,7 @@ var Composites = {};
     };
 
     /**
-     * Connects bodies in the composite with constraints in a grid pattern, with optional cross braces
+     * Connects bodies in the composite with constraints in a grid pattern, with optional cross braces.
      * @method mesh
      * @param {composite} composite
      * @param {number} columns
@@ -150,7 +161,8 @@ var Composites = {};
     };
     
     /**
-     * Description
+     * Create a new composite containing bodies created in the callback in a pyramid arrangement.
+     * This function uses the body's bounds to prevent overlaps.
      * @method pyramid
      * @param {number} xx
      * @param {number} yy
@@ -190,7 +202,7 @@ var Composites = {};
     };
 
     /**
-     * Description
+     * Creates a composite with a Newton's Cradle setup of bodies and constraints.
      * @method newtonsCradle
      * @param {number} xx
      * @param {number} yy
@@ -205,7 +217,7 @@ var Composites = {};
         for (var i = 0; i < number; i++) {
             var separation = 1.9,
                 circle = Bodies.circle(xx + i * (size * separation), yy + length, size, 
-                            { inertia: 99999, restitution: 1, friction: 0, frictionAir: 0.0001, slop: 0.01 }),
+                            { inertia: Infinity, restitution: 1, friction: 0, frictionAir: 0.0001, slop: 1 }),
                 constraint = Constraint.create({ pointA: { x: xx + i * (size * separation), y: yy }, bodyB: circle });
 
             Composite.addBody(newtonsCradle, circle);
@@ -216,7 +228,7 @@ var Composites = {};
     };
     
     /**
-     * Description
+     * Creates a composite with simple car setup of bodies and constraints.
      * @method car
      * @param {number} xx
      * @param {number} yy
@@ -247,10 +259,7 @@ var Composites = {};
             collisionFilter: {
                 group: group
             },
-            restitution: 0.5, 
-            friction: 0.9,
-            frictionStatic: 10,
-            slop: 0.5,
+            friction: 0.8,
             density: 0.01
         });
                     
@@ -258,10 +267,7 @@ var Composites = {};
             collisionFilter: {
                 group: group
             },
-            restitution: 0.5, 
-            friction: 0.9,
-            frictionStatic: 10,
-            slop: 0.5,
+            friction: 0.8,
             density: 0.01
         });
                     
@@ -269,14 +275,14 @@ var Composites = {};
             bodyA: body,
             pointA: { x: wheelAOffset, y: wheelYOffset },
             bodyB: wheelA,
-            stiffness: 0.5
+            stiffness: 0.2
         });
                         
         var axelB = Constraint.create({
             bodyA: body,
             pointA: { x: wheelBOffset, y: wheelYOffset },
             bodyB: wheelB,
-            stiffness: 0.5
+            stiffness: 0.2
         });
         
         Composite.addBody(car, body);
@@ -289,7 +295,7 @@ var Composites = {};
     };
 
     /**
-     * Creates a simple soft body like object
+     * Creates a simple soft body like object.
      * @method softBody
      * @param {number} xx
      * @param {number} yy

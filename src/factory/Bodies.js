@@ -2,8 +2,7 @@
 * The `Matter.Bodies` module contains factory methods for creating rigid body models
 * with commonly used body configurations (such as rectangles, circles and other polygons).
 *
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js)
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
+* See the included usage [examples](https://github.com/liabru/matter-js/tree/master/examples).
 *
 * @class Bodies
 */
@@ -11,6 +10,14 @@
 // TODO: true circle bodies
 
 var Bodies = {};
+
+module.exports = Bodies;
+
+var Vertices = require('../geometry/Vertices');
+var Common = require('../core/Common');
+var Body = require('../body/Body');
+var Bounds = require('../geometry/Bounds');
+var Vector = require('../geometry/Vector');
 
 (function() {
 
@@ -66,12 +73,19 @@ var Bodies = {};
 
         var x1 = width * slope,
             x2 = x1 + roof,
-            x3 = x2 + x1;
+            x3 = x2 + x1,
+            verticesPath;
+
+        if (slope < 0.5) {
+            verticesPath = 'L 0 0 L ' + x1 + ' ' + (-height) + ' L ' + x2 + ' ' + (-height) + ' L ' + x3 + ' 0';
+        } else {
+            verticesPath = 'L 0 0 L ' + x2 + ' ' + (-height) + ' L ' + x3 + ' 0';
+        }
 
         var trapezoid = {
             label: 'Trapezoid Body',
             position: { x: x, y: y },
-            vertices: Vertices.fromPath('L 0 0 L ' + x1 + ' ' + (-height) + ' L ' + x2 + ' ' + (-height) + ' L ' + x3 + ' 0')
+            vertices: Vertices.fromPath(verticesPath)
         };
 
         if (options.chamfer) {
@@ -110,7 +124,7 @@ var Bodies = {};
             sides += 1;
 
         // round to nearest divisible by four, so you get the same width and height
-        division = Math.floor(sides / 4);
+        var division = Math.floor(sides / 4);
         sides = division * 4;
 
         // flag for better rendering

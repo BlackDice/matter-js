@@ -1,17 +1,22 @@
 /**
-* _Internal Class_, not generally used outside of the engine's internals.
+* The `Matter.Pairs` module contains methods for creating and manipulating collision pair sets.
 *
 * @class Pairs
 */
 
 var Pairs = {};
 
+module.exports = Pairs;
+
+var Pair = require('./Pair');
+var Common = require('../core/Common');
+
 (function() {
     
     var _pairMaxIdleLife = 1000;
 
     /**
-     * Creates a new pairs structure
+     * Creates a new pairs structure.
      * @method create
      * @param {object} options
      * @return {pairs} A new pairs structure
@@ -27,7 +32,7 @@ var Pairs = {};
     };
 
     /**
-     * Description
+     * Updates pairs given a list of collisions.
      * @method update
      * @param {object} pairs
      * @param {collision[]} collisions
@@ -94,7 +99,7 @@ var Pairs = {};
     };
     
     /**
-     * Description
+     * Finds and removes pairs that have been inactive for a set amount of time.
      * @method removeOld
      * @param {object} pairs
      * @param {number} timestamp
@@ -134,7 +139,7 @@ var Pairs = {};
     };
 
     /**
-     * Clears the given pairs structure
+     * Clears the given pairs structure.
      * @method clear
      * @param {pairs} pairs
      * @return {pairs} pairs

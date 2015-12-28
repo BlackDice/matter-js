@@ -2,13 +2,24 @@
 * The `Matter.MouseConstraint` module contains methods for creating mouse constraints.
 * Mouse constraints are used for allowing user interaction, providing the ability to move bodies via the mouse or touch.
 *
-* See [Demo.js](https://github.com/liabru/matter-js/blob/master/demo/js/Demo.js) 
-* and [DemoMobile.js](https://github.com/liabru/matter-js/blob/master/demo/js/DemoMobile.js) for usage examples.
+* See the included usage [examples](https://github.com/liabru/matter-js/tree/master/examples).
 *
 * @class MouseConstraint
 */
 
 var MouseConstraint = {};
+
+module.exports = MouseConstraint;
+
+var Vertices = require('../geometry/Vertices');
+var Sleeping = require('../core/Sleeping');
+var Mouse = require('../core/Mouse');
+var Events = require('../core/Events');
+var Detector = require('../collision/Detector');
+var Constraint = require('./Constraint');
+var Composite = require('../body/Composite');
+var Common = require('../core/Common');
+var Bounds = require('../geometry/Bounds');
 
 (function() {
 
@@ -24,11 +35,13 @@ var MouseConstraint = {};
     MouseConstraint.create = function(engine, options) {
         var mouse = (engine ? engine.mouse : null) || (options ? options.mouse : null);
 
-        if (!mouse && engine && engine.render && engine.render.canvas) {
-            mouse = Mouse.create(engine.render.canvas);
-        } else {
-            mouse = Mouse.create();
-            Common.log('MouseConstraint.create: options.mouse was undefined, engine.render.canvas was undefined, may not function as expected', 'warn');
+        if (!mouse) {
+            if (engine && engine.render && engine.render.canvas) {
+                mouse = Mouse.create(engine.render.canvas);
+            } else {
+                mouse = Mouse.create();
+                Common.log('MouseConstraint.create: options.mouse was undefined, engine.render.canvas was undefined, may not function as expected', 'warn');
+            }
         }
 
         var constraint = Constraint.create({ 
@@ -115,7 +128,7 @@ var MouseConstraint = {};
     };
 
     /**
-     * Triggers mouse constraint events
+     * Triggers mouse constraint events.
      * @method _triggerEvents
      * @private
      * @param {mouse} mouseConstraint

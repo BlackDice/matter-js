@@ -12,6 +12,15 @@
 
 var Render = {};
 
+module.exports = Render;
+
+var Common = require('../core/Common');
+var Composite = require('../body/Composite');
+var Bounds = require('../geometry/Bounds');
+var Events = require('../core/Events');
+var Grid = require('../collision/Grid');
+var Vector = require('../geometry/Vector');
+
 (function() {
     
     /**
@@ -27,6 +36,7 @@ var Render = {};
             controller: Render,
             element: null,
             canvas: null,
+            mouse: null,
             options: {
                 width: 800,
                 height: 600,
@@ -50,11 +60,17 @@ var Render = {};
                 showShadows: false,
                 showVertexNumbers: false,
                 showConvexHulls: false,
-                showInternalEdges: false
+                showInternalEdges: false,
+                showMousePosition: false
             }
         };
 
         var render = Common.extend(defaults, options);
+
+        if (render.canvas) {
+            render.canvas.width = render.options.width || render.canvas.width;
+            render.canvas.height = render.options.height || render.canvas.height;
+        }
 
         render.canvas = render.canvas || _createCanvas(render.options.width, render.options.height);
         render.context = render.canvas.getContext('2d');
@@ -66,8 +82,8 @@ var Render = {};
                 y: 0
             }, 
             max: { 
-                x: render.options.width,
-                y: render.options.height
+                x: render.canvas.width,
+                y: render.canvas.height
             }
         };
 
@@ -126,6 +142,12 @@ var Render = {};
             bodies = [],
             constraints = [],
             i;
+
+        var event = {
+            timestamp: engine.timing.timestamp
+        };
+
+        Events.trigger(render, 'beforeRender', event);
 
         // apply background if it has changed
         if (render.currentBackground !== background)
@@ -212,6 +234,9 @@ var Render = {};
         if (options.showVertexNumbers)
             Render.vertexNumbers(engine, bodies, context);
 
+        if (options.showMousePosition)
+            Render.mousePosition(engine, render.mouse, context);
+
         Render.constraints(constraints, context);
 
         if (options.showBroadphase && engine.broadphase.controller === Grid)
@@ -224,6 +249,8 @@ var Render = {};
             // revert view transforms
             context.setTransform(options.pixelRatio, 0, 0, options.pixelRatio, 0, 0);
         }
+
+        Events.trigger(render, 'afterRender', event);
     };
 
     /**
@@ -237,30 +264,37 @@ var Render = {};
         var c = context,
             world = engine.world,
             render = engine.render,
+            metrics = engine.metrics,
             options = render.options,
             bodies = Composite.allBodies(world),
             space = "    ";
 
         if (engine.timing.timestamp - (render.debugTimestamp || 0) >= 500) {
             var text = "";
-            text += "fps: " + Math.round(engine.timing.fps) + space;
+
+            if (metrics.timing) {
+                text += "fps: " + Math.round(metrics.timing.fps) + space;
+            }
 
             // @if DEBUG
-            if (engine.metrics.extended) {
-                text += "delta: " + engine.timing.delta.toFixed(3) + space;
-                text += "correction: " + engine.timing.correction.toFixed(3) + space;
+            if (metrics.extended) {
+                if (metrics.timing) {
+                    text += "delta: " + metrics.timing.delta.toFixed(3) + space;
+                    text += "correction: " + metrics.timing.correction.toFixed(3) + space;
+                }
+
                 text += "bodies: " + bodies.length + space;
 
                 if (engine.broadphase.controller === Grid)
-                    text += "buckets: " + engine.metrics.buckets + space;
+                    text += "buckets: " + metrics.buckets + space;
 
                 text += "\n";
 
-                text += "collisions: " + engine.metrics.collisions + space;
+                text += "collisions: " + metrics.collisions + space;
                 text += "pairs: " + engine.pairs.list.length + space;
-                text += "broad: " + engine.metrics.broadEff + space;
-                text += "mid: " + engine.metrics.midEff + space;
-                text += "narrow: " + engine.metrics.narrowEff + space;
+                text += "broad: " + metrics.broadEff + space;
+                text += "mid: " + metrics.midEff + space;
+                text += "narrow: " + metrics.narrowEff + space;
             }
             // @endif            
 
@@ -400,6 +434,9 @@ var Render = {};
             for (k = body.parts.length > 1 ? 1 : 0; k < body.parts.length; k++) {
                 part = body.parts[k];
 
+                if (!part.render.visible)
+                    continue;
+
                 if (part.render.sprite && part.render.sprite.texture && !options.wireframes) {
                     // part sprite
                     var sprite = part.render.sprite,
@@ -411,8 +448,13 @@ var Render = {};
                     c.translate(part.position.x, part.position.y); 
                     c.rotate(part.angle);
 
-                    c.drawImage(texture, texture.width * -0.5 * sprite.xScale, texture.height * -0.5 * sprite.yScale, 
-                                texture.width * sprite.xScale, texture.height * sprite.yScale);
+                    c.drawImage(
+                        texture,
+                        texture.width * -sprite.xOffset * sprite.xScale, 
+                        texture.height * -sprite.yOffset * sprite.yScale, 
+                        texture.width * sprite.xScale, 
+                        texture.height * sprite.yScale
+                    );
 
                     // revert translation, hopefully faster than save / restore
                     c.rotate(-part.angle);
@@ -573,6 +615,20 @@ var Render = {};
                 }
             }
         }
+    };
+
+    /**
+     * Renders mouse position.
+     * @private
+     * @method mousePosition
+     * @param {engine} engine
+     * @param {mouse} mouse
+     * @param {RenderingContext} context
+     */
+    Render.mousePosition = function(engine, mouse, context) {
+        var c = context;
+        c.fillStyle = 'rgba(255,255,255,0.8)';
+        c.fillText(mouse.position.x + '  ' + mouse.position.y, mouse.position.x + 5, mouse.position.y - 5);
     };
 
     /**
@@ -1022,7 +1078,7 @@ var Render = {};
 
             }
 
-            context.setLineDash([0]);
+            context.setLineDash([]);
             context.translate(-0.5, -0.5);
         }
 
@@ -1117,6 +1173,32 @@ var Render = {};
         render.canvas.style.backgroundSize = "contain";
         render.currentBackground = background;
     };
+
+    /*
+    *
+    *  Events Documentation
+    *
+    */
+
+    /**
+    * Fired before rendering
+    *
+    * @event beforeRender
+    * @param {} event An event object
+    * @param {number} event.timestamp The engine.timing.timestamp of the event
+    * @param {} event.source The source object of the event
+    * @param {} event.name The name of the event
+    */
+
+    /**
+    * Fired after rendering
+    *
+    * @event afterRender
+    * @param {} event An event object
+    * @param {number} event.timestamp The engine.timing.timestamp of the event
+    * @param {} event.source The source object of the event
+    * @param {} event.name The name of the event
+    */
 
     /*
     *

@@ -1,10 +1,20 @@
 /**
 * The `Matter.Query` module contains methods for performing collision queries.
 *
+* See the included usage [examples](https://github.com/liabru/matter-js/tree/master/examples).
+*
 * @class Query
 */
 
 var Query = {};
+
+module.exports = Query;
+
+var Vector = require('../geometry/Vector');
+var SAT = require('./SAT');
+var Bounds = require('../geometry/Bounds');
+var Bodies = require('../factory/Bodies');
+var Vertices = require('../geometry/Vertices');
 
 (function() {
 

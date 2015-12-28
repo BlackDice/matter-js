@@ -1,10 +1,14 @@
 /**
-* _Internal Class_, not generally used outside of the engine's internals.
+* The `Matter.Sleeping` module contains methods to manage the sleeping state of bodies.
 *
 * @class Sleeping
 */
 
 var Sleeping = {};
+
+module.exports = Sleeping;
+
+var Events = require('./Events');
 
 (function() {
 
@@ -86,7 +90,7 @@ var Sleeping = {};
     };
   
     /**
-     * Description
+     * Set a body as sleeping or awake.
      * @method set
      * @param {body} body
      * @param {boolean} isSleeping

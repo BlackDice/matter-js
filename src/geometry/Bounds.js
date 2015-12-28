@@ -1,15 +1,17 @@
 /**
-* _Internal Class_, not generally used outside of the engine's internals.
+* The `Matter.Bounds` module contains methods for creating and manipulating axis-aligned bounding boxes (AABB).
 *
 * @class Bounds
 */
 
 var Bounds = {};
 
+module.exports = Bounds;
+
 (function() {
 
     /**
-     * Description
+     * Creates a new axis-aligned bounding box (AABB) for the given vertices.
      * @method create
      * @param {vertices} vertices
      * @return {bounds} A new bounds object
@@ -27,7 +29,7 @@ var Bounds = {};
     };
 
     /**
-     * Description
+     * Updates bounds using the given vertices and extends the bounds given a velocity.
      * @method update
      * @param {bounds} bounds
      * @param {vertices} vertices
@@ -63,7 +65,7 @@ var Bounds = {};
     };
 
     /**
-     * Description
+     * Returns true if the bounds contains the given point.
      * @method contains
      * @param {bounds} bounds
      * @param {vector} point
@@ -75,7 +77,7 @@ var Bounds = {};
     };
 
     /**
-     * Description
+     * Returns true if the two bounds intersect.
      * @method overlaps
      * @param {bounds} boundsA
      * @param {bounds} boundsB
@@ -87,7 +89,7 @@ var Bounds = {};
     };
 
     /**
-     * Translates the bounds by the given vector
+     * Translates the bounds by the given vector.
      * @method translate
      * @param {bounds} bounds
      * @param {vector} vector
@@ -100,7 +102,7 @@ var Bounds = {};
     };
 
     /**
-     * Shifts the bounds to the given position
+     * Shifts the bounds to the given position.
      * @method shift
      * @param {bounds} bounds
      * @param {vector} position
