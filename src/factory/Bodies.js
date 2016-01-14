@@ -153,7 +153,7 @@ var Vector = require('../geometry/Vector');
 
         var theta = 2 * Math.PI / sides,
             path = '',
-            offset = 0; //theta * 0.5;
+            offset = theta * 0.5;
 
         for (var i = 0; i < sides; i += 1) {
             var angle = offset + (i * theta),
@@ -322,9 +322,8 @@ var Vector = require('../geometry/Vector');
         if (parts.length > 1) {
             // create the parent body to be returned, that contains generated compound parts
             body = Body.create(Common.extend({ parts: parts.slice(0) }, options));
-            Body.translate(body, { x: x, y: y });
-            body.position.x = x;
-            body.position.y = y;
+            body.offset = {x: body.position.x, y: body.position.y};
+            Body.setPosition(body, { x: x, y: y });
             return body;
         } else {
             return parts[0];
