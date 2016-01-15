@@ -512,24 +512,6 @@ var Axes = require('../geometry/Axes');
     };
 
     /**
-     * Updates the body position and rotation according to offset vector.
-     * @method placeAndRotate
-     * @param {body} body
-     * @param {number} x
-     * @param {number} y
-     * @param {angle} y
-     */
-    Body.placeAndRotate = function(body, x, y, angle) {
-        if(body.offset){
-            Body.translate(body, body.offset);
-            if(angle){
-                Body.rotate(body, angle);
-                Body.setPosition(body, Vector.rotateAbout(body.position, angle, {x: x, y: y}));
-            };
-        };
-    };
-
-    /**
      * Performs a simulation step for the given `body`, including updating position and angle using Verlet integration.
      * @method update
      * @param {body} body

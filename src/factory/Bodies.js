@@ -322,8 +322,11 @@ var Vector = require('../geometry/Vector');
         if (parts.length > 1) {
             // create the parent body to be returned, that contains generated compound parts
             body = Body.create(Common.extend({ parts: parts.slice(0) }, options));
-            body.offset = {x: body.position.x, y: body.position.y};
-            Body.setPosition(body, { x: x, y: y });
+            Body.translate(body, { x: x, y: y });
+            body.position.x = x
+            body.position.y = y
+            body.positionPrev.x = x
+            body.positionPrev.y = y
             return body;
         } else {
             return parts[0];
